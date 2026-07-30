@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitGrader — Push code. Capture proof. Grade safely.</title>
+<meta name="description" content="GitGrader is an open-source, self-hostable grading platform: students push assignments over SSH, submissions are recorded immutably and graded in isolated containers.">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" href="assets/gitgrader-favicon-adaptive.svg" type="image/svg+xml">
+<meta property="og:title" content="GitGrader — Git-native grading platform">
+<meta property="og:description" content="Push code. Capture proof. Grade safely. Open-source, self-hostable programming assessment over Git.">
+<meta property="og:image" content="https://git-grader.github.io/assets/gitgrader-og-image.png">
+<meta property="og:url" content="https://git-grader.github.io/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0D162C; --mint: #03EA9E; --white: #FFFFFF;
+    --ink-900: #192237; --ink-800: #32394C; --ink-700: #4A5161;
+    --mint-300: #64F2C3; --mint-600: #03C385;
+    --text: #F5F7FA; --text-2: #94A3B8; --warn: #F59E0B;
+    --dur-fast: 160ms; --dur-base: 240ms; --dur-slow: 480ms; --dur-emph: 640ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--ink); color: var(--text);
+    font: 400 16px/1.6 Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(13,22,44,.86);
+        backdrop-filter: blur(10px); border-bottom: 1px solid var(--ink-800); }
+  .nav-in { display: flex; align-items: center; gap: 28px; height: 64px; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 800;
+              font-size: 18px; text-decoration: none; }
+  .nav-logo img { height: 26px; }
+  .nav-links { display: flex; gap: 22px; margin-left: auto; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--text-2); font-size: 14px;
+                 font-weight: 500; transition: color var(--dur-fast); }
+  .nav-links a:hover { color: var(--text); }
+  .btn { display: inline-block; padding: 10px 20px; border-radius: 999px;
+         font-weight: 600; font-size: 14px; text-decoration: none;
+         transition: transform var(--dur-fast) var(--ease-out),
+                     background var(--dur-fast); }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-mint { background: var(--mint); color: var(--ink); }
+  .btn-mint:hover { background: var(--mint-300); }
+  .btn-ghost { border: 1px solid var(--ink-700); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--text-2); }
+
+  /* hero */
+  .hero { padding: 88px 0 72px; text-align: center; }
+  .hero-mark { width: min(300px, 56vw); margin: 0 auto 40px; }
+  .hero h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800;
+             letter-spacing: -0.02em; line-height: 1.12; }
+  .hero h1 .mint { color: var(--mint); }
+  .hero p.lead { max-width: 640px; margin: 22px auto 0; color: var(--text-2);
+                 font-size: 18px; }
+  .hero-cta { margin-top: 36px; display: flex; gap: 14px; justify-content: center;
+              flex-wrap: wrap; }
+  .hero-quick { margin: 40px auto 0; max-width: 720px; background: var(--ink-900);
+                border: 1px solid var(--ink-800); border-radius: 12px;
+                padding: 14px 20px; font-size: 13.5px; overflow-x: auto;
+                text-align: left; white-space: nowrap; }
+  .hero-quick .p { color: var(--mint); user-select: none; }
+
+  /* sections */
+  section { padding: 76px 0; border-top: 1px solid var(--ink-900); }
+  .kicker { color: var(--mint); font-size: 12px; font-weight: 700;
+            letter-spacing: .14em; text-transform: uppercase; }
+  h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; margin-top: 10px;
+       letter-spacing: -0.01em; }
+  .sub { color: var(--text-2); margin-top: 12px; max-width: 640px; }
+
+  /* flow */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+          margin-top: 44px; }
+  .step { background: var(--ink-900); border: 1px solid var(--ink-800);
+          border-radius: 14px; padding: 20px 16px; }
+  .step .n { font-family: "JetBrains Mono", monospace; font-size: 12px;
+             color: var(--mint); }
+  .step h3 { font-size: 15px; margin: 8px 0 6px; font-weight: 700; }
+  .step p { font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+  .step:last-child { border-color: var(--mint-600); }
+
+  /* pillars */
+  .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+             margin-top: 44px; }
+  .pillar { border: 1px solid var(--ink-800); border-radius: 14px; padding: 24px; }
+  .pillar h3 { color: var(--mint); font-size: 14px; letter-spacing: .08em;
+               text-transform: uppercase; }
+  .pillar p { margin-top: 10px; font-size: 14px; color: var(--text-2); }
+
+  /* terminal */
+  .term { margin-top: 44px; background: #0A1123; border: 1px solid var(--ink-800);
+          border-radius: 16px; overflow: hidden; }
+  .term-bar { display: flex; gap: 7px; padding: 13px 18px;
+              background: var(--ink-900); }
+  .term-bar span { width: 11px; height: 11px; border-radius: 50%;
+                   background: var(--ink-700); }
+  .term pre { padding: 24px 28px; font-size: 13.5px; line-height: 2;
+              overflow-x: auto; }
+  .t-dim { color: var(--text-2); } .t-mint { color: var(--mint); }
+  .t-warn { color: var(--warn); }
+
+  /* split */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+           margin-top: 44px; align-items: start; }
+  .feat { list-style: none; padding: 0; }
+  .feat li { padding: 10px 0 10px 30px; position: relative; font-size: 14.5px;
+             color: var(--text-2); border-bottom: 1px solid var(--ink-900); }
+  .feat li::before { content: ""; position: absolute; left: 2px; top: 17px;
+                     width: 12px; height: 7px; border-left: 2.5px solid var(--mint);
+                     border-bottom: 2.5px solid var(--mint);
+                     transform: rotate(-45deg); }
+  .feat li strong { color: var(--text); font-weight: 600; }
+  .stack { background: var(--ink-900); border: 1px solid var(--ink-800);
+           border-radius: 14px; padding: 26px; }
+  .stack h3 { font-size: 13px; color: var(--mint); letter-spacing: .1em;
+              text-transform: uppercase; margin-bottom: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .chip { font-family: "JetBrains Mono", monospace; font-size: 12px;
+          padding: 5px 12px; border: 1px solid var(--ink-700);
+          border-radius: 999px; color: var(--text-2); }
+
+  /* quickstart */
+  .qs { margin-top: 44px; background: var(--ink-900); border: 1px solid var(--ink-800);
+        border-radius: 16px; padding: 30px; }
+  .qs pre { background: #0A1123; border-radius: 10px; padding: 18px 22px;
+            font-size: 13.5px; overflow-x: auto; line-height: 1.9; }
+  .qs .note { margin-top: 16px; font-size: 13.5px; color: var(--text-2); }
+  .qs .note code { color: var(--text); font-size: 12.5px; }
+
+  /* docs */
+  .docs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+          margin-top: 44px; }
+  .doc { border: 1px solid var(--ink-800); border-radius: 12px; padding: 18px 20px;
+         text-decoration: none; transition: border-color var(--dur-fast),
+         transform var(--dur-fast) var(--ease-out); }
+  .doc:hover { border-color: var(--mint-600); transform: translateY(-2px); }
+  .doc h3 { font-size: 15px; font-weight: 700; }
+  .doc p { font-size: 13px; color: var(--text-2); margin-top: 5px; }
+
+  /* honesty note */
+  .note-box { margin-top: 44px; border-left: 3px solid var(--mint);
+              background: var(--ink-900); border-radius: 0 12px 12px 0;
+              padding: 20px 26px; font-size: 14.5px; color: var(--text-2); }
+  .note-box strong { color: var(--text); }
+
+  footer { border-top: 1px solid var(--ink-900); padding: 48px 0 56px; }
+  .foot { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .foot img { height: 24px; }
+  .foot .links { margin-left: auto; display: flex; gap: 20px; }
+  .foot a { color: var(--text-2); font-size: 13.5px; text-decoration: none; }
+  .foot a:hover { color: var(--text); }
+  .foot .meta { width: 100%; margin-top: 18px; font-size: 12.5px;
+                color: var(--ink-700); font-family: "JetBrains Mono", monospace; }
+
+  /* hero mark animation */
+  .gg-brackets { opacity: 0;
+    animation: gg-fade var(--dur-slow) var(--ease-out) forwards; }
+  .gg-check { stroke-dasharray: 438; stroke-dashoffset: 438;
+    animation: gg-draw var(--dur-emph) var(--ease-out) var(--dur-fast) forwards; }
+  @keyframes gg-fade { to { opacity: 1; } }
+  @keyframes gg-draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .gg-brackets { animation: none; opacity: 1; }
+    .gg-check { animation: none; stroke-dashoffset: 0; }
+    .btn, .doc { transition: none; }
+  }
+
+  @media (max-width: 900px) {
+    .flow { grid-template-columns: repeat(2, 1fr); }
+    .pillars { grid-template-columns: repeat(2, 1fr); }
+    .split { grid-template-columns: 1fr; }
+    .docs { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .flow, .pillars, .docs { grid-template-columns: 1fr; }
+    .nav-links a:not(.btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="nav-logo" href="#">
+      <img src="assets/gitgrader-mark-reversed.svg" alt="" width="45" height="26">
+      GitGrader
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#quickstart">Quick start</a>
+      <a href="#docs">Docs</a>
+      <a class="btn btn-mint" href="https://github.com/git-grader/gitgrader">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <svg class="hero-mark" viewBox="0 0 1032 546" role="img" aria-label="GitGrader mark">
+    <g class="gg-brackets">
+      <path d="M 304.0 68.0 L 68.0 273.0 L 304.0 478.0" fill="none" stroke="#FFFFFF" stroke-width="96" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 728.0 68.0 L 964.0 273.0 L 728.0 478.0" fill="none" stroke="#FFFFFF" stroke-width="96" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <path class="gg-check" d="M 390.5 295.5 L 460.0 378.5 L 646.0 206.5" fill="none" stroke="#03EA9E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1>Push code. Capture proof.<br><span class="mint">Grade safely.</span></h1>
+  <p class="lead">GitGrader is an open-source, self-hostable platform for courses
+  that accept programming assignments over Git: students push work through SSH,
+  the service records an immutable submission and grades it in an isolated
+  container, and instructors manage coursework through a web interface.</p>
+  <div class="hero-cta">
+    <a class="btn btn-mint" href="#quickstart">Deploy your own grader</a>
+    <a class="btn btn-ghost" href="https://github.com/git-grader/gitgrader">View source</a>
+  </div>
+  <div class="hero-quick mono"><span class="p">$</span> git clone https://github.com/git-grader/gitgrader && cd gitgrader && docker compose up -d</div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <span class="kicker">How it works</span>
+    <h2>A trusted path from push to proof</h2>
+    <p class="sub">Every accepted push becomes a durable submission and a
+    reproducible grading event — nothing runs on the host, nothing is graded
+    twice differently.</p>
+    <div class="flow">
+      <div class="step"><span class="n">01</span><h3>Push</h3>
+        <p>Students submit over SSH with registered keys — the workflow they already use.</p></div>
+      <div class="step"><span class="n">02</span><h3>Capture</h3>
+        <p>The push is admitted and recorded as an immutable, append-only submission.</p></div>
+      <div class="step"><span class="n">03</span><h3>Run</h3>
+        <p>A queued job grades the code in an isolated Docker sandbox with hidden tests.</p></div>
+      <div class="step"><span class="n">04</span><h3>Grade</h3>
+        <p>Scoring is transparent: tests passed / tests total, recorded with the run.</p></div>
+      <div class="step"><span class="n">05</span><h3>Review</h3>
+        <p>Students get a result link; instructors review evidence in the web app.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="kicker">Principles</span>
+    <h2>Built for courses that need control</h2>
+    <div class="pillars">
+      <div class="pillar"><h3>Git-native</h3>
+        <p>Submission is a <span class="mono">git push</span>. No upload portals, no zip files, no plugins.</p></div>
+      <div class="pillar"><h3>Auditable</h3>
+        <p>Append-only submissions, grading runs, and audit events. The record is durable and reviewable.</p></div>
+      <div class="pillar"><h3>Isolated</h3>
+        <p>Grading runs in controlled containers with runtimes pinned by image digest — never on the host.</p></div>
+      <div class="pillar"><h3>Self-hostable</h3>
+        <p>Your institution keeps operational and data control. PostgreSQL, Docker, LDAP — no external services.</p></div>
+    </div>
+
+    <div class="term" role="img" aria-label="Terminal output showing a graded submission">
+      <div class="term-bar"><span></span><span></span><span></span></div>
+      <pre>
+<span class="t-dim">$</span> git push gitgrader main
+submission   <span class="t-mint">7f3a1c2</span>   captured
+<span class="t-dim">assignment   a04        data-structures</span>
+<span class="t-dim">runner       python-3.13 / isolated</span>
+tests        42 executed                                    <span class="t-mint">PASS</span>
+<span class="t-dim">style        2 advisory findings</span>                            <span class="t-warn">WARN</span>
+result       score 100.0 %                                  <span class="t-mint">PASS</span></pre>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <span class="kicker">Features</span>
+    <h2>Evidence, not promises</h2>
+    <div class="split">
+      <ul class="feat">
+        <li><strong>Git-over-SSH admission</strong> with registered-key and SSHSIG signature checks</li>
+        <li><strong>Versioned templates</strong> and hidden test suites students cannot read</li>
+        <li><strong>Runtimes pinned by image digest</strong> for reproducible grading</li>
+        <li><strong>Append-only submissions</strong> and grading runs — the record cannot be rewritten</li>
+        <li><strong>PostgreSQL-backed queue</strong> and container runner isolation</li>
+        <li><strong>Opaque result tokens</strong>, LDAP instructor auth, audit events, rate limits</li>
+      </ul>
+      <div class="stack">
+        <h3>Backend</h3>
+        <div class="chips">
+          <span class="chip">Java 25</span><span class="chip">Spring Boot</span>
+          <span class="chip">Spring Modulith</span><span class="chip">Apache MINA SSHD</span>
+          <span class="chip">JGit</span><span class="chip">PostgreSQL</span>
+          <span class="chip">Flyway</span><span class="chip">Testcontainers</span>
+        </div>
+        <h3>Frontend</h3>
+        <div class="chips">
+          <span class="chip">React 19</span><span class="chip">TypeScript</span>
+          <span class="chip">Vite</span><span class="chip">MUI</span>
+          <span class="chip">TanStack Query</span>
+        </div>
+        <h3>License</h3>
+        <div class="chips"><span class="chip">Apache-2.0</span><span class="chip">open source</span></div>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>Honest about limitations:</strong> GitGrader is a grading and
+      submission system, not an authorship detector. A verified signature proves
+      a commit was signed by a registered key — academic-integrity policy stays
+      with your course.
+    </div>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <span class="kicker">Quick start</span>
+    <h2>Deploy your own grader</h2>
+    <div class="qs">
+      <pre class="mono"><span class="t-dim"># clone, configure, start</span>
+git clone https://github.com/git-grader/gitgrader
+cd gitgrader
+cp .env.example .env        <span class="t-dim"># set passwords + public HTTP/SSH names</span>
+docker compose up -d
+scripts/verify-install.sh   <span class="t-dim"># readiness, API meta, SSH checks</span></pre>
+      <p class="note">Compose starts PostgreSQL and the app. Full details in the
+      <a href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md">installation guide</a> —
+      including building the image locally with <code>./mvnw spring-boot:build-image</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap">
+    <span class="kicker">Documentation</span>
+    <h2>Operate it with confidence</h2>
+    <div class="docs">
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/architecture.md"><h3>Architecture</h3><p>Modules, flows, and design decisions</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/security.md"><h3>Security model</h3><p>Isolation, admission, and threat model</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md"><h3>Installation</h3><p>Production-minded setup guide</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/operations.md"><h3>Operations</h3><p>Running the service day to day</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/backup-restore.md"><h3>Backup &amp; restore</h3><p>Protecting the submission record</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/api.md"><h3>API</h3><p>REST endpoints and result tokens</p></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <img src="assets/gitgrader-lockup-reversed.svg" alt="GitGrader">
+    <div class="links">
+      <a href="https://github.com/git-grader/gitgrader">Platform</a>
+      <a href="https://github.com/git-grader/brand">Brand</a>
+      <a href="https://github.com/git-grader/.github/blob/main/SECURITY.md">Security</a>
+      <a href="https://github.com/git-grader/.github/blob/main/CONTRIBUTING.md">Contributing</a>
+    </div>
+    <div class="meta">gitgrader / open source / self-hostable / Apache-2.0</div>
+  </div>
+</footer>
+
+</body>
+</html>
