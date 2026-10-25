@@ -4,12 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GitGrader — Push code. Capture proof. Grade safely.</title>
-<meta name="description" content="GitGrader is an open-source, self-hostable grading platform: students push assignments over SSH, submissions are recorded immutably and graded in isolated containers.">
+<meta name="description" content="GitGrader is an open-source, self-hostable grading platform: students push signed work over SSH, submissions are recorded immutably and graded in isolated containers, and instructors manage the whole course in one workspace.">
+<link rel="canonical" href="https://git-grader.github.io/">
+<meta name="theme-color" content="#0D162C">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="icon" href="assets/gitgrader-favicon-adaptive.svg" type="image/svg+xml">
+<meta property="og:site_name" content="GitGrader">
 <meta property="og:title" content="GitGrader — Git-native grading platform">
-<meta property="og:description" content="Push code. Capture proof. Grade safely. Open-source, self-hostable programming assessment over Git.">
+<meta property="og:description" content="Push code. Capture proof. Grade safely. Open-source, self-hostable programming assessment over Git, with signed pushes, hidden weighted tests, and isolated grading.">
 <meta property="og:image" content="https://git-grader.github.io/assets/gitgrader-og-image.png">
+<meta property="og:image:alt" content="GitGrader mark: white angle brackets around a mint check mark">
 <meta property="og:url" content="https://git-grader.github.io/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
@@ -63,15 +67,16 @@
   .hero h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800;
              letter-spacing: -0.02em; line-height: 1.12; }
   .hero h1 .mint { color: var(--mint); }
-  .hero p.lead { max-width: 640px; margin: 22px auto 0; color: var(--text-2);
+  .hero p.lead { max-width: 680px; margin: 22px auto 0; color: var(--text-2);
                  font-size: 18px; }
   .hero-cta { margin-top: 36px; display: flex; gap: 14px; justify-content: center;
               flex-wrap: wrap; }
-  .hero-quick { margin: 40px auto 0; max-width: 720px; background: var(--ink-900);
+  .hero-quick { margin: 40px auto 0; max-width: 800px; background: var(--ink-900);
                 border: 1px solid var(--ink-800); border-radius: 12px;
                 padding: 14px 20px; font-size: 13.5px; overflow-x: auto;
                 text-align: left; white-space: nowrap; }
   .hero-quick .p { color: var(--mint); user-select: none; }
+  .hero-note { margin-top: 14px; font-size: 13px; color: var(--text-2); }
 
   /* sections */
   section { padding: 76px 0; border-top: 1px solid var(--ink-900); }
@@ -79,13 +84,13 @@
             letter-spacing: .14em; text-transform: uppercase; }
   h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; margin-top: 10px;
        letter-spacing: -0.01em; }
-  .sub { color: var(--text-2); margin-top: 12px; max-width: 640px; }
+  .sub { color: var(--text-2); margin-top: 12px; max-width: 680px; }
 
   /* flow */
-  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
           margin-top: 44px; }
   .step { background: var(--ink-900); border: 1px solid var(--ink-800);
-          border-radius: 14px; padding: 20px 16px; }
+          border-radius: 14px; padding: 20px 18px; }
   .step .n { font-family: "JetBrains Mono", monospace; font-size: 12px;
              color: var(--mint); }
   .step h3 { font-size: 15px; margin: 8px 0 6px; font-weight: 700; }
@@ -93,7 +98,7 @@
   .step:last-child { border-color: var(--mint-600); }
 
   /* pillars */
-  .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
              margin-top: 44px; }
   .pillar { border: 1px solid var(--ink-800); border-radius: 14px; padding: 24px; }
   .pillar h3 { color: var(--mint); font-size: 14px; letter-spacing: .08em;
@@ -112,8 +117,24 @@
   .t-dim { color: var(--text-2); } .t-mint { color: var(--mint); }
   .t-warn { color: var(--warn); }
 
+  /* roles */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+           margin-top: 44px; }
+  .role { background: var(--ink-900); border: 1px solid var(--ink-800);
+          border-radius: 14px; padding: 28px; }
+  .role h3 { font-size: 18px; font-weight: 700; margin-top: 8px; }
+  .role ul { list-style: none; padding: 0; margin-top: 16px; }
+  .role li { padding: 8px 0 8px 26px; position: relative; font-size: 14px;
+             color: var(--text-2); border-bottom: 1px solid var(--ink-800); }
+  .role li:last-child { border-bottom: 0; }
+  .role li::before { content: ""; position: absolute; left: 2px; top: 15px;
+                     width: 12px; height: 7px; border-left: 2.5px solid var(--mint);
+                     border-bottom: 2.5px solid var(--mint);
+                     transform: rotate(-45deg); }
+  .role li strong { color: var(--text); font-weight: 600; }
+
   /* split */
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+  .split { display: grid; grid-template-columns: 1.25fr .75fr; gap: 48px;
            margin-top: 44px; align-items: start; }
   .feat { list-style: none; padding: 0; }
   .feat li { padding: 10px 0 10px 30px; position: relative; font-size: 14.5px;
@@ -128,6 +149,7 @@
   .stack h3 { font-size: 13px; color: var(--mint); letter-spacing: .1em;
               text-transform: uppercase; margin-bottom: 14px; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .chips:last-child { margin-bottom: 0; }
   .chip { font-family: "JetBrains Mono", monospace; font-size: 12px;
           padding: 5px 12px; border: 1px solid var(--ink-700);
           border-radius: 999px; color: var(--text-2); }
@@ -138,7 +160,10 @@
   .qs pre { background: #0A1123; border-radius: 10px; padding: 18px 22px;
             font-size: 13.5px; overflow-x: auto; line-height: 1.9; }
   .qs .note { margin-top: 16px; font-size: 13.5px; color: var(--text-2); }
+  .qs .note + .note { margin-top: 10px; }
   .qs .note code { color: var(--text); font-size: 12.5px; }
+  .qs .note a { color: var(--mint); text-decoration: none; }
+  .qs .note a:hover { text-decoration: underline; }
 
   /* docs */
   .docs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
@@ -159,11 +184,11 @@
   footer { border-top: 1px solid var(--ink-900); padding: 48px 0 56px; }
   .foot { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
   .foot img { height: 24px; }
-  .foot .links { margin-left: auto; display: flex; gap: 20px; }
+  .foot .links { margin-left: auto; display: flex; gap: 20px; flex-wrap: wrap; }
   .foot a { color: var(--text-2); font-size: 13.5px; text-decoration: none; }
   .foot a:hover { color: var(--text); }
   .foot .meta { width: 100%; margin-top: 18px; font-size: 12.5px;
-                color: var(--ink-700); font-family: "JetBrains Mono", monospace; }
+                color: var(--text-2); font-family: "JetBrains Mono", monospace; }
 
   /* hero mark animation */
   .gg-brackets { opacity: 0;
@@ -181,6 +206,7 @@
   @media (max-width: 900px) {
     .flow { grid-template-columns: repeat(2, 1fr); }
     .pillars { grid-template-columns: repeat(2, 1fr); }
+    .roles { grid-template-columns: 1fr; }
     .split { grid-template-columns: 1fr; }
     .docs { grid-template-columns: repeat(2, 1fr); }
   }
@@ -200,6 +226,7 @@
     </a>
     <div class="nav-links">
       <a href="#how">How it works</a>
+      <a href="#workspace">Workspace</a>
       <a href="#features">Features</a>
       <a href="#quickstart">Quick start</a>
       <a href="#docs">Docs</a>
@@ -218,14 +245,15 @@
   </svg>
   <h1>Push code. Capture proof.<br><span class="mint">Grade safely.</span></h1>
   <p class="lead">GitGrader is an open-source, self-hostable platform for courses
-  that accept programming assignments over Git: students push work through SSH,
-  the service records an immutable submission and grades it in an isolated
-  container, and instructors manage coursework through a web interface.</p>
+  that accept programming assignments over Git. Students register an SSH key, push
+  signed work, and get an unguessable result link; instructors run the whole course
+  from one workspace; every grading run happens in a throwaway, networkless container.</p>
   <div class="hero-cta">
     <a class="btn btn-mint" href="#quickstart">Deploy your own grader</a>
     <a class="btn btn-ghost" href="https://github.com/git-grader/gitgrader">View source</a>
   </div>
-  <div class="hero-quick mono"><span class="p">$</span> git clone https://github.com/git-grader/gitgrader && cd gitgrader && docker compose up -d</div>
+  <div class="hero-quick mono"><span class="p">$</span> git clone https://github.com/git-grader/gitgrader && cd gitgrader && ./scripts/install.sh --demo</div>
+  <p class="hero-note">Demo on <span class="mono">localhost:8080</span> · sign in as <span class="mono">instructor / password</span> · sample course included</p>
 </header>
 
 <section id="how">
@@ -233,19 +261,21 @@
     <span class="kicker">How it works</span>
     <h2>A trusted path from push to proof</h2>
     <p class="sub">Every accepted push becomes a durable submission and a
-    reproducible grading event — nothing runs on the host, nothing is graded
-    twice differently.</p>
+    reproducible grading event. Nothing runs on the host, and every result points
+    back to the exact template, test suite, runtime, and commit that produced it.</p>
     <div class="flow">
-      <div class="step"><span class="n">01</span><h3>Push</h3>
-        <p>Students submit over SSH with registered keys — the workflow they already use.</p></div>
-      <div class="step"><span class="n">02</span><h3>Capture</h3>
-        <p>The push is admitted and recorded as an immutable, append-only submission.</p></div>
-      <div class="step"><span class="n">03</span><h3>Run</h3>
-        <p>A queued job grades the code in an isolated Docker sandbox with hidden tests.</p></div>
-      <div class="step"><span class="n">04</span><h3>Grade</h3>
-        <p>Scoring is transparent: tests passed / tests total, recorded with the run.</p></div>
-      <div class="step"><span class="n">05</span><h3>Review</h3>
-        <p>Students get a result link; instructors review evidence in the web app.</p></div>
+      <div class="step"><span class="n">01</span><h3>Register</h3>
+        <p>Students enrol an SSH public key at <span class="mono">/register</span>. There is no student account to create or password to reset.</p></div>
+      <div class="step"><span class="n">02</span><h3>Push</h3>
+        <p>Work arrives over SSH. Commits must be signed with a registered key; unsigned commits, oversized pushes, and rewritten history are refused.</p></div>
+      <div class="step"><span class="n">03</span><h3>Capture</h3>
+        <p>The push becomes an immutable, append-only submission. Only the newest queued attempt is graded; older ones are cancelled, never lost.</p></div>
+      <div class="step"><span class="n">04</span><h3>Run</h3>
+        <p>The application asks a separate runner for a sandbox. The sandbox has no network, no capabilities, and a read-only root.</p></div>
+      <div class="step"><span class="n">05</span><h3>Grade</h3>
+        <p>Hidden tests run against the suite manifest. Each declared test reports an outcome, and per-test weights decide the score.</p></div>
+      <div class="step"><span class="n">06</span><h3>Review</h3>
+        <p>The push prints a result link and a standing overview. Instructors see submissions, class progress, and exports.</p></div>
     </div>
   </div>
 </section>
@@ -256,25 +286,73 @@
     <h2>Built for courses that need control</h2>
     <div class="pillars">
       <div class="pillar"><h3>Git-native</h3>
-        <p>Submission is a <span class="mono">git push</span>. No upload portals, no zip files, no plugins.</p></div>
+        <p>Submission is a <span class="mono">git push</span>. No upload portals, no zip files, no plugins, no new client to teach.</p></div>
+      <div class="pillar"><h3>No student accounts</h3>
+        <p>A registered SSH key identifies a student when pushing. An unguessable link is the only credential needed to read a result.</p></div>
       <div class="pillar"><h3>Auditable</h3>
-        <p>Append-only submissions, grading runs, and audit events. The record is durable and reviewable.</p></div>
-      <div class="pillar"><h3>Isolated</h3>
-        <p>Grading runs in controlled containers with runtimes pinned by image digest — never on the host.</p></div>
+        <p>Submissions, grading runs, and audit events are append-only. Regrades add evidence; they do not rewrite it.</p></div>
+      <div class="pillar"><h3>Isolated by construction</h3>
+        <p>The web application builds no Docker client at all. A separate runner holds the socket and only ever starts a sandbox.</p></div>
+      <div class="pillar"><h3>Fair under load</h3>
+        <p>One job per student, newest-wins coalescing, queue ceilings, and rolling hourly push allowances keep one student from crowding the course.</p></div>
       <div class="pillar"><h3>Self-hostable</h3>
-        <p>Your institution keeps operational and data control. PostgreSQL, Docker, LDAP — no external services.</p></div>
+        <p>Your institution keeps operational and data control. PostgreSQL, Docker, and LDAP — no external services required.</p></div>
     </div>
 
     <div class="term" role="img" aria-label="Terminal output showing a graded submission">
       <div class="term-bar"><span></span><span></span><span></span></div>
       <pre>
 <span class="t-dim">$</span> git push gitgrader main
-submission   <span class="t-mint">7f3a1c2</span>   captured
-<span class="t-dim">assignment   a04        data-structures</span>
-<span class="t-dim">runner       python-3.13 / isolated</span>
-tests        42 executed                                    <span class="t-mint">PASS</span>
-<span class="t-dim">style        2 advisory findings</span>                            <span class="t-warn">WARN</span>
-result       score 100.0 %                                  <span class="t-mint">PASS</span></pre>
+remote: GitGrader
+remote:
+remote: Student:    Alan Turing
+remote: Assignment: String utilities
+remote: Commit:     7f3a1c2
+remote: Signature:  <span class="t-mint">Verified</span>
+remote:
+remote: 7 of 10 tests passed
+remote: Score: 70.0 %
+remote:
+remote: ----------------------------------------------------
+remote: Results overview (all graded work):
+remote: https://grader.example.org/results/overview/…
+remote:
+remote: Detailed result for this submission:
+remote: https://grader.example.org/results/…</pre>
+    </div>
+  </div>
+</section>
+
+<section id="workspace">
+  <div class="wrap">
+    <span class="kicker">One workspace</span>
+    <h2>Two paths, one course record</h2>
+    <p class="sub">Students get the shortest possible path to feedback. Instructors
+    and administrators get the controls a real cohort needs — and the server, not
+    the browser, is the authority for every one of them.</p>
+    <div class="roles">
+      <div class="role">
+        <span class="kicker">For students</span>
+        <h3>Register once, push, read</h3>
+        <ul>
+          <li><strong>Self-register an SSH key</strong> for the course and class — up to five keys by default</li>
+          <li><strong>Clone a starter repository</strong> per assignment, with the non-default SSH port already handled</li>
+          <li><strong>Push signed commits</strong> and see the score, allowed hints, and result link in the terminal</li>
+          <li><strong>Keep a standing overview</strong> of every course and assignment result in one page</li>
+          <li><strong>No account, no password</strong> — each accepted push returns a result link, and the standing overview link is rotated on every push</li>
+        </ul>
+      </div>
+      <div class="role">
+        <span class="kicker">For instructors &amp; administrators</span>
+        <h3>Run the whole course</h3>
+        <ul>
+          <li><strong>Courses, classes, and registration windows</strong> with student verification, suspension, and key management</li>
+          <li><strong>Materials</strong> with versioned public templates and confidential hidden test suites</li>
+          <li><strong>Assignments</strong> with runtime, schedule, grading limits, and individual deadline extensions</li>
+          <li><strong>Submissions, class progress, and reports</strong> exported as CSV, JSON, or XLSX</li>
+          <li><strong>Administration</strong> for audit log, settings, and runtimes, with LDAP-backed sign-in</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -285,26 +363,34 @@ result       score 100.0 %                                  <span class="t-mint"
     <h2>Evidence, not promises</h2>
     <div class="split">
       <ul class="feat">
-        <li><strong>Git-over-SSH admission</strong> with registered-key and SSHSIG signature checks</li>
-        <li><strong>Versioned templates</strong> and hidden test suites students cannot read</li>
-        <li><strong>Runtimes pinned by image digest</strong> for reproducible grading</li>
-        <li><strong>Append-only submissions</strong> and grading runs — the record cannot be rewritten</li>
-        <li><strong>PostgreSQL-backed queue</strong> and container runner isolation</li>
-        <li><strong>Opaque result tokens</strong>, LDAP instructor auth, audit events, rate limits</li>
+        <li><strong>Git-over-SSH admission</strong> with registered-key and SSHSIG signature checks; signed commits required by default</li>
+        <li><strong>Push admission limits</strong> on total size, file size, file count, and new commits; non-fast-forward and duplicate commits refused</li>
+        <li><strong>Versioned starter templates</strong> and hidden test suites students cannot read</li>
+        <li><strong>Manifest-declared tests</strong> with per-test weights, categories, and didactic hints; a suite without a manifest is refused</li>
+        <li><strong>Runtimes pinned by image digest</strong>, with single- and two-container topologies; a shimmed run keeps hidden tests in a container the submission cannot mount</li>
+        <li><strong>Hardened sandboxes</strong>: no network, read-only root, dropped capabilities, no-new-privileges, CPU/memory/PID caps, and a timeout</li>
+        <li><strong>Append-only submissions and grading runs</strong>; regrades add a run instead of overwriting the previous result</li>
+        <li><strong>Fair dispatch</strong>: newest-wins coalescing, one job per student, queue ceilings, and rolling hourly push allowances</li>
+        <li><strong>Opaque result tokens</strong> stored only as hashes, plus a standing results overview rotated on every accepted push</li>
+        <li><strong>LDAP instructor/admin authentication</strong>, audit events with HMAC-hashed client addresses, and per-address rate limits</li>
+        <li><strong>Fixed-query course reports</strong> and CSV, JSON, and XLSX exports for snapshots outside GitGrader</li>
+        <li><strong>OpenAPI contract</strong> at <span class="mono">/api/v1/openapi</span> and Swagger UI at <span class="mono">/api/v1/docs</span> — disabled under production by default</li>
       </ul>
       <div class="stack">
         <h3>Backend</h3>
         <div class="chips">
-          <span class="chip">Java 25</span><span class="chip">Spring Boot</span>
-          <span class="chip">Spring Modulith</span><span class="chip">Apache MINA SSHD</span>
-          <span class="chip">JGit</span><span class="chip">PostgreSQL</span>
-          <span class="chip">Flyway</span><span class="chip">Testcontainers</span>
+          <span class="chip">Java 25</span><span class="chip">Spring Boot 4.1</span>
+          <span class="chip">Spring Modulith 2.1</span><span class="chip">Spring Security 7.1</span>
+          <span class="chip">Apache MINA SSHD 2.20</span><span class="chip">JGit 7.8</span>
+          <span class="chip">PostgreSQL</span><span class="chip">Flyway</span>
+          <span class="chip">Testcontainers</span><span class="chip">docker-java 3.7</span>
         </div>
         <h3>Frontend</h3>
         <div class="chips">
           <span class="chip">React 19</span><span class="chip">TypeScript</span>
-          <span class="chip">Vite</span><span class="chip">MUI</span>
-          <span class="chip">TanStack Query</span>
+          <span class="chip">Vite 8</span><span class="chip">MUI v9</span>
+          <span class="chip">TanStack Query</span><span class="chip">React Router 8</span>
+          <span class="chip">Zod</span>
         </div>
         <h3>License</h3>
         <div class="chips"><span class="chip">Apache-2.0</span><span class="chip">open source</span></div>
@@ -312,9 +398,11 @@ result       score 100.0 %                                  <span class="t-mint"
     </div>
     <div class="note-box">
       <strong>Honest about limitations:</strong> GitGrader is a grading and
-      submission system, not an authorship detector. A verified signature proves
-      a commit was signed by a registered key — academic-integrity policy stays
-      with your course.
+      submission system, not an authorship detector. A verified signature proves a
+      commit was signed by a key registered to that student, not that the student
+      wrote the work unaided. It also runs untrusted code, so read the
+      <a href="https://github.com/git-grader/gitgrader/blob/main/docs/security.md">security model</a>
+      before exposing an instance to anyone else.
     </div>
   </div>
 </section>
@@ -324,15 +412,22 @@ result       score 100.0 %                                  <span class="t-mint"
     <span class="kicker">Quick start</span>
     <h2>Deploy your own grader</h2>
     <div class="qs">
-      <pre class="mono"><span class="t-dim"># clone, configure, start</span>
+      <pre class="mono"><span class="t-dim"># needs Docker and, for the first build, JDK 25</span>
 git clone https://github.com/git-grader/gitgrader
 cd gitgrader
-cp .env.example .env        <span class="t-dim"># set passwords + public HTTP/SSH names</span>
-docker compose up -d
-scripts/verify-install.sh   <span class="t-dim"># readiness, API meta, SSH checks</span></pre>
-      <p class="note">Compose starts PostgreSQL and the app. Full details in the
-      <a href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md">installation guide</a> —
-      including building the image locally with <code>./mvnw spring-boot:build-image</code>.</p>
+./scripts/install.sh --demo  <span class="t-dim"># build, start, and load the sample course</span>
+scripts/verify-install.sh    <span class="t-dim"># readiness, API meta, SSH reachability</span></pre>
+      <p class="note">The demo comes up on <code>http://localhost:8080</code> with a
+      sample course, a starter project, and hidden tests. Sign in as
+      <code>instructor</code> / <code>password</code>, or register a student key at
+      <code>/register</code>. The reference solution deliberately scores
+      <strong>7 of 10 (70.0 %)</strong> — a different number means something is wrong.</p>
+      <p class="note">Leave off <code>--demo</code> for an empty instance. Before anyone
+      else uses it, set both database passwords, a real <code>APP_PUBLIC_URL</code>
+      (HTTPS), the public SSH host and port, and a random
+      <code>GRADING_RUNNER_API_SECRET</code>. Full details in the
+      <a href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md">installation guide</a>
+      and the <a href="https://github.com/git-grader/gitgrader/blob/main/docs/manual-testing.md">manual testing walkthrough</a>.</p>
     </div>
   </div>
 </section>
@@ -342,12 +437,15 @@ scripts/verify-install.sh   <span class="t-dim"># readiness, API meta, SSH check
     <span class="kicker">Documentation</span>
     <h2>Operate it with confidence</h2>
     <div class="docs">
-      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/architecture.md"><h3>Architecture</h3><p>Modules, flows, and design decisions</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/architecture.md"><h3>Architecture</h3><p>Modules, containers, and design decisions</p></a>
       <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/security.md"><h3>Security model</h3><p>Isolation, admission, and threat model</p></a>
-      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md"><h3>Installation</h3><p>Production-minded setup guide</p></a>
-      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/operations.md"><h3>Operations</h3><p>Running the service day to day</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/installation.md"><h3>Installation</h3><p>Production-minded setup and TLS</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/instructor-ui.md"><h3>Instructor workspace</h3><p>Roles, workflow, and data loading</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/configuration.md"><h3>Configuration</h3><p>Every setting and its default</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/api.md"><h3>API</h3><p>REST conventions and result tokens</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/operations.md"><h3>Operations</h3><p>Running and observing the service</p></a>
       <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/backup-restore.md"><h3>Backup &amp; restore</h3><p>Protecting the submission record</p></a>
-      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/api.md"><h3>API</h3><p>REST endpoints and result tokens</p></a>
+      <a class="doc" href="https://github.com/git-grader/gitgrader/blob/main/docs/grading-runtime-protocol.md"><h3>Grading protocol</h3><p>How sandboxes run hidden tests</p></a>
     </div>
   </div>
 </section>
@@ -357,11 +455,13 @@ scripts/verify-install.sh   <span class="t-dim"># readiness, API meta, SSH check
     <img src="assets/gitgrader-lockup-reversed.svg" alt="GitGrader">
     <div class="links">
       <a href="https://github.com/git-grader/gitgrader">Platform</a>
+      <a href="https://github.com/git-grader/gitgrader/blob/main/CHANGELOG.md">Changelog</a>
       <a href="https://github.com/git-grader/brand">Brand</a>
+      <a href="https://github.com/git-grader/gitgrader/blob/main/docs/privacy.md">Privacy</a>
       <a href="https://github.com/git-grader/.github/blob/main/SECURITY.md">Security</a>
       <a href="https://github.com/git-grader/.github/blob/main/CONTRIBUTING.md">Contributing</a>
     </div>
-    <div class="meta">gitgrader / open source / self-hostable / Apache-2.0</div>
+    <div class="meta">gitgrader / v0.1.0 / Apache-2.0 / open source / self-hostable</div>
   </div>
 </footer>
 
